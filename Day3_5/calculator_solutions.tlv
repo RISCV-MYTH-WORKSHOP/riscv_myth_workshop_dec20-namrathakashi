@@ -241,3 +241,4 @@
 \SV
    endmodule
 
+//Lab6 - Calculator with Single-Value Memory
