@@ -2,7 +2,7 @@
 \SV
 //Calculator labs solutions here
 
-//Lab1: Combinationalal calculator
+//Lab1: Combinational calculator
 
 \m4_TLV_version 1d: tl-x.org
 \SV
