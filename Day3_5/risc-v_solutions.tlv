@@ -71,13 +71,24 @@
                       $is_u_instr ? { $instr[31:12] , 12'b0 } :
                       $is_j_instr ? { {12{$instr[31]}}, $instr[19:12], $instr[20], $instr[30:21], 1'b0 } :
                                     >>1$imm[31:0];
-                                    
+         
+         //Adding validity for the fields that are not relevant for all types of instructions
+         $rs2_valid =        $is_r_instr || $is_s_instr || $is_b_instr;
+         $rs1_funct3_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
+         $rd_valid =         $is_r_instr || $is_i_instr || $is_u_instr || $is_j_instr;
+         $funct7_valid =     $is_r_instr;
+         
          //Decode other fields - source registers (rs1, rs2), destination register (rd), and opcodes (funct7, funct3, opcode)
-         $rs1[4:0]    = $instr[19:15];
-         $rs2[4:0]    = $instr[24:20];
-         $rd[4:0]     = $instr[11:7];
-         $funct7[6:0] = $instr[31:25];
-         $funct3[2:0] = $instr[14:12];
+         ?$rs1_funct3_valid
+            $rs1[4:0]    = $instr[19:15];
+            $funct3[2:0] = $instr[14:12];
+         ?$rs2_valid
+            $rs2[4:0]    = $instr[24:20];
+         ?$rd_valid
+            $rd[4:0]     = $instr[11:7];
+         ?$funct7_valid
+            $funct7[6:0] = $instr[31:25];
+         
          $opcode[6:0] = $instr[6:0];
       
       
