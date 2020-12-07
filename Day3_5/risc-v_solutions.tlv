@@ -124,9 +124,9 @@
          $br_tgt_pc[31:0] = $pc + $imm;
          
          //Register file bypass logic for RAW hazards
-         $src1_value[31:0]  = >>1$rf_wr_en && ((>>1$rd == $rs1) || (>>1$rd == $rs2)) ?
+         $src1_value[31:0]  = >>1$rf_wr_en && (>>1$rd == $rs1) ?
                               >>1$result : $rf_rd_data1;
-         $src2_value[31:0]  = >>1$rf_wr_en && ((>>1$rd == $rs1) || (>>1$rd == $rs2)) ?
+         $src2_value[31:0]  = >>1$rf_wr_en && (>>1$rd == $rs2) ?
                               >>1$result : $rf_rd_data2;
          
       @3
