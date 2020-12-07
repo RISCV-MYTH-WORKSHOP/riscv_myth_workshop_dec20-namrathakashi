@@ -40,15 +40,19 @@
    |cpu
       @0
          $reset = *reset;
-
-
-
+         
       // YOUR CODE HERE
-         $pc[31:0]   = >>1$reset    ? 32'b0 :
-                       >>1$taken_br ? >>1$br_tgt_pc :
-                                     (>>1$pc + 32'b100);
+         ?$valid_or_reset
+            $pc[31:0]   = >>1$reset          ? 32'b0 :
+                          >>3$valid_taken_br ? >>3$br_tgt_pc :
+                                              (>>3$pc + 32'b100);
          $imem_rd_en = !$reset;
          $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
+         
+         //3-Cycle valid
+         $start = >>1$reset && !$reset;
+         $valid = $reset ? 1'b0 : ($start || >>3$valid);
+         $valid_or_reset = $valid || $reset;
       @1
          //Reading the instruction from the IMEM
          $instr[31:0] = $imem_rd_data[31:0];
@@ -121,10 +125,10 @@
                                     32'bx;
          
          //Register file write
-         $rf_wr_en         = $rd_valid && !($rd == 'b0);
+         $rf_wr_en         = $rd_valid && !($rd == 'b0) && $valid;
          $rf_wr_index[4:0] = $rd;
          $rf_wr_data[31:0] = $result;
-         
+
          //Resolving branch direction
          $taken_br = $is_beq ? ($src1_value == $src2_value) :
                      $is_bne ? ($src1_value != $src2_value) :
@@ -132,6 +136,8 @@
                      $is_bge ? ($src1_value >= $src2_value) ^ ($src1_value[31]!=$src2_value[31]) :
                      $is_bltu? ($src1_value <  $src2_value) :
                      $is_bgeu? ($src1_value >= $src2_value) : 1'b0;
+         
+         $valid_taken_br = $valid && $taken_br;
          
          //Computing branch target address (PC+imm)
          $br_tgt_pc[31:0] = $pc + $imm;
@@ -144,7 +150,8 @@
 
    
    // Assert these to end simulation (before Makerchip cycle limit).
-   *passed = *cyc_cnt > 40;
+   //*passed = |cpu/xreg[10]>>5$value == (1+2+3+4+5+6+7+8+9);
+   *passed = *cyc_cnt > 300;
    *failed = 1'b0;
    
    // Macro instantiations for:
