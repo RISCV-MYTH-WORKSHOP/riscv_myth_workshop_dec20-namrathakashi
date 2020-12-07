@@ -123,9 +123,13 @@
          //Computing branch target address (PC+imm)
          $br_tgt_pc[31:0] = $pc + $imm;
          
+         //Register file bypass logic for RAW hazards
+         $src1_value[31:0]  = >>1$rf_wr_en && ((>>1$rd == $rs1) || (>>1$rd == $rs2)) ?
+                              >>1$result : $rf_rd_data1;
+         $src2_value[31:0]  = >>1$rf_wr_en && ((>>1$rd == $rs1) || (>>1$rd == $rs2)) ?
+                              >>1$result : $rf_rd_data2;
+         
       @3
-         $src1_value[31:0]  = $rf_rd_data1;
-         $src2_value[31:0]  = $rf_rd_data2;
          
          //ALU (ADDI, ADD)
          $result[31:0] = $is_addi ? $src1_value + $imm :
@@ -145,7 +149,6 @@
          $rf_wr_en         = $rd_valid && !($rd == 'b0) && $valid;
          $rf_wr_index[4:0] = $rd;
          $rf_wr_data[31:0] = $result;
-                    
       
       
       // Note: Because of the magic we are using for visualisation, if visualisation is enabled below,
