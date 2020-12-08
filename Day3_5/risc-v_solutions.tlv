@@ -186,6 +186,8 @@
                          $is_auipc ? $pc + $imm :
                          $is_jal   ? $pc + 3'b100 :
                          $is_jalr  ? $pc + 3'b100 :
+                         $is_load  ? $src1_value + $imm :
+                         $is_s_instr ? $src1_value + $imm :
                                     32'bx;
          
          //Resolving branch direction
@@ -199,9 +201,11 @@
          $valid_taken_br = $valid && $taken_br;
          
          //Register file write
-         $rf_wr_en         = $rd_valid && !($rd == 'b0) && $valid;
-         $rf_wr_index[4:0] = $rd;
-         $rf_wr_data[31:0] = $result;
+         $rf_wr_en         = ($rd_valid && !($rd == 'b0) && $valid) || (>>2$is_load && >>2$valid);
+         $rf_wr_index[4:0] = $valid ? $rd : >>2$result;
+         $rf_wr_data[31:0] = $valid ? $result : >>2$ld_data;
+         
+         $ld_data = >>2$is_load ;
       
       
       // Note: Because of the magic we are using for visualisation, if visualisation is enabled below,
