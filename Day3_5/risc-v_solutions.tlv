@@ -231,7 +231,7 @@
    // Assert these to end simulation (before Makerchip cycle limit).
    //*passed = |cpu/xreg[10]>>5$value == (1+2+3+4+5+6+7+8+9);
    //*passed = *cyc_cnt > 300;
-   *passed = |cpu/xreg[17]>>100$value == 45;
+   *passed = |cpu/xreg[17]>>10$value == 45;
    *failed = 1'b0;
    
    // Macro instantiations for:
