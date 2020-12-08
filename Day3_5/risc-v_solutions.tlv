@@ -35,7 +35,7 @@
    m4_asm(SW, r0, r10, 10000)
    m4_asm(LW, r17, r0, 10000)
    // Optional:
-   // m4_asm(JAL, r7, 00000000000000000000) // Done. Jump to itself (infinite loop). (Up to 20-bit signed immediate plus implicit 0 bit (unlike JALR) provides byte address; last immediate bit should also be 0)
+   m4_asm(JAL, r7, 00000000000000000000) // Done. Jump to itself (infinite loop). (Up to 20-bit signed immediate plus implicit 0 bit (unlike JALR) provides byte address; last immediate bit should also be 0)
    m4_define_hier(['M4_IMEM'], M4_NUM_INSTRS)
 
    |cpu
@@ -45,7 +45,8 @@
       // YOUR CODE HERE
          $pc[31:0]   = >>1$reset          ? 32'b0 :
                        >>3$valid_taken_br ? >>3$br_tgt_pc :
-                       >>3$is_load        ? >>3$inc_pc :
+                       >>3$valid_jump     ? (>>3$is_jal ? >>3$br_tgt_pc : >>3$jalr_tgt_pc) :
+                       >>3$load_valid     ? >>3$inc_pc :
                                             >>1$inc_pc;
          $imem_rd_en = !$reset;
          $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
@@ -119,7 +120,7 @@
          $is_lui   = $dec_bits ==? 11'bx_xxx_0110111;
          $is_auipc = $dec_bits ==? 11'bx_xxx_0010111;
          $is_jal   = $dec_bits ==? 11'bx_xxx_1101111;
-         $is_jalb  = $dec_bits ==? 11'bx_xxx_1100111;
+         $is_jalr  = $dec_bits ==? 11'bx_xxx_1100111;
          $is_sb    = $dec_bits ==? 11'bx_000_0100011;
          $is_sh    = $dec_bits ==? 11'bx_001_0100011;
          $is_sw    = $dec_bits ==? 11'bx_010_0100011;
@@ -198,14 +199,19 @@
                      $is_bge ? ($src1_value >= $src2_value) ^ ($src1_value[31]!=$src2_value[31]) :
                      $is_bltu? ($src1_value <  $src2_value) :
                      $is_bgeu? ($src1_value >= $src2_value) : 1'b0;
-         $valid = !(>>1$valid_taken_br || >>2$valid_taken_br || >>1$is_load || >>2$is_load);
+         $valid = !(>>1$valid_taken_br || >>2$valid_taken_br || >>1$load_valid || >>2$load_valid || >>1$valid_jump || >>2$valid_jump);
          $valid_taken_br = $valid && $taken_br;
+         $valid_jump = $valid && $is_jump;
          
          $load_valid = $is_load && $valid;
          //Register file write
          $rf_wr_en         = ($rd_valid && !($rd == 'b0) && $valid) || (>>2$load_valid);
          $rf_wr_index[4:0] = $valid ? $rd : >>2$rd;
          $rf_wr_data[31:0] = $valid ? $result : >>2$ld_data;
+         
+         //Jump instructions
+         $is_jump = $is_jal || $is_jalr;
+         $jalr_tgt_pc = $src1_value + $imm;
          
       @4   
          $dmem_wr_en         = $is_s_instr && $valid;
@@ -225,7 +231,7 @@
    // Assert these to end simulation (before Makerchip cycle limit).
    //*passed = |cpu/xreg[10]>>5$value == (1+2+3+4+5+6+7+8+9);
    //*passed = *cyc_cnt > 300;
-   *passed = |cpu/xreg[17]>>5$value == 45;
+   *passed = |cpu/xreg[17]>>100$value == 45;
    *failed = 1'b0;
    
    // Macro instantiations for:
