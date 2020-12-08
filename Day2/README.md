@@ -1,10 +1,18 @@
-# Commands list
+# Introduction to RISC-V ISA
 
-## GCC
+RISC-V ISA is an open-specification, free Instruction Set Architecture, that originated in UC-Berkeley with David Patterson as one of the inventors, enabling any company or any individual to build a processor that can support the ISA.
+
+More information about the ISA can be found here-
+[RISC-V Specifications](https://riscv.org/technical/specifications/)
+[RISC-V card](https://inst.eecs.berkeley.edu//~cs61c/fa17/img/riscvcard.pdf)
+
+## GNU Compiler toolchain commands
+
+### GCC
   *Compile:*   gcc <file.c>  
   *Execute:*   ./a.out  
   
-## RISC-V
+### RISC-V
   *Compile:*       riscv64-unknown-elf-gcc -O1 -mabi=lp64 -march=rv64i -o <obj.o> <inputfile.c>  
   *Object Dump:*   riscv64-unknown-elf-objdump -d <obj.o>  
   *Execute:*       spike pk <obj.o>  
