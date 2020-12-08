@@ -1,14 +1,14 @@
 # Commands list
 
 ## GCC
-  *Compile:*   gcc <file.c>
-  *Execute:*   ./a.out
+  *Compile:*   gcc <file.c>  
+  *Execute:*   ./a.out  
   
 ## RISC-V
-  *Compile:*       riscv64-unknown-elf-gcc -O1 -mabi=lp64 -march=rv64i -o <obj.o> <inputfile.c>
-  *Object Dump:*   riscv64-unknown-elf-objdump -d <obj.o>
-  *Execute:*       spike pk <obj.o>
-  *Debugger:*      spike -d pk <obj.o>
+  *Compile:*       riscv64-unknown-elf-gcc -O1 -mabi=lp64 -march=rv64i -o <obj.o> <inputfile.c>  
+  *Object Dump:*   riscv64-unknown-elf-objdump -d <obj.o>  
+  *Execute:*       spike pk <obj.o>  
+  *Debugger:*      spike -d pk <obj.o>  
   
   #### Compile command explained:
         -O1            compiler name; Also try -Ofast which provides a smaller list of assembler instructions when compiled
