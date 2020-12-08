@@ -1,6 +1,8 @@
-# Introduction to RISC-V ISA
+# RISC-V ISA
 
 RISC-V ISA is an open-specification, free Instruction Set Architecture, that originated in UC-Berkeley with David Patterson as one of the inventors, enabling any company or any individual to build a processor that can support the ISA.
+
+An RV64I architecture supports Base Integer instructions. It contains 32 general-purpose registers (addressed as x0, x1, ... x31) with each register being 64bits wide (XLEN=64)
 
 More information about the ISA can be found here-  
 [RISC-V Specifications](https://riscv.org/technical/specifications/)  
@@ -35,3 +37,5 @@ More information about the ISA can be found here-
         `:reg 0 sp`              Print out the contents of stack pointer  
         `:<Enter key>`           To run the next instruction  
  
+# ABI  
+The Operating System accesses specific architectural registers in the hardware through the ABI(Application Binary Interface) or system-call interface. 
